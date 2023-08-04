@@ -1,0 +1,70 @@
+name: s3-bucket-deploy-cdk
+on:
+  workflow_dispatch:
+       inputs :
+          aws-region-name:
+             description: aws-region
+             required: true
+ 
+    
+
+
+jobs:
+  cdk_pipeline_deploy:
+    name: aws_cdk
+    runs-on: ubuntu-latest
+
+    
+    steps:
+    
+      - uses: actions/checkout@v3
+
+
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1   
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
+          Aws-region: ${{env.aws-region}}
+
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Instal cdk cli
+        run: pip install aws-cdk-cli
+
+      - name: Instal requirements
+        run: pip install -r requirements.txt
+        working-directory: s3_resource
+
+      - name: cdk ls
+        run: cdk ls
+        working-directory: s3_resource
+
+      - name: cdk synth
+        run: cdk synth
+        working-directory: s3_resource
+
+      - name: cdk bootstrap
+        run: cdk bootstrap
+        working-directory: s3_resource
+
+
+      - name: cdk deploy
+        run: cdk deploy
+        working-directory: s3_resource  
+
+
+        
+
+
+
+
+
+
+        
+      
