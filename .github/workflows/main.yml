@@ -89,7 +89,7 @@ jobs:
 
       - uses: trstringer/manual-approval@v1
         with:
-          
+          secret: ${{ secrets.TOKEN }}
           approvers: jatin0310
           minimum-approvals: 1
 
