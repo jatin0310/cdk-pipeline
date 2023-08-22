@@ -90,7 +90,7 @@ jobs:
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ secrets.TOKEN }}
-          approvers: jatin0310
+          approvers: jatin0310,nikita-ceq
           minimum-approvals: 1
 
 
