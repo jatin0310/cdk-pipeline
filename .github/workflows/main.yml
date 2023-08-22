@@ -10,8 +10,8 @@ on:
 
 
 jobs:
-  cdk_pipeline_deploy:
-    name: aws_cdk
+  cdk_pipeline_approval:
+    name: aws_cdk_aprove
     runs-on: ubuntu-latest
 
     
@@ -68,13 +68,47 @@ jobs:
           echo ::set-output name=cdk_toolkit_found::$(aws cloudformation describe-stacks --stack-name $BOOTSTRAP_STACK_NAME --query 'Stacks[].StackId' --region $CDK_DEPLOY_REGION --output text)
 
 
+      # - name: cdk deploy
+      #   run: |
+      #    if [[ -z "${{ steps.check_cdk_toolkit.outputs.cdk_toolkit_found }}" ]]; then
+      #     cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
+      #    fi
+      #    cdk deploy --require-approval never
+      #   working-directory: s3_resource  
+
+  cdk_pipeline_deploy:
+
+    name: aws_cdk_aprove
+    runs-on: ubuntu-latest
+    needs: cdk_pipeline_approval
+
+    steps:
+    
+      - uses: actions/checkout@v3
+
+
+      - uses: trstringer/manual-approval@v1
+        with:
+          
+          approvers: jatin0310
+          minimum-approvals: 1
+
+
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1   
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
+          # aws-region: ${{env.aws-region}}
+          aws-region: us-east-1
+
+
       - name: cdk deploy
         run: |
-         if [[ -z "${{ steps.check_cdk_toolkit.outputs.cdk_toolkit_found }}" ]]; then
-          cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
-         fi
          cdk deploy --require-approval never
-        working-directory: s3_resource  
+        working-directory: s3_resource
+
 
 
         
