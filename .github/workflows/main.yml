@@ -106,6 +106,9 @@ jobs:
 
       - name: cdk deploy
         run: |
+         if [[ -z "${{ steps.check_cdk_toolkit.outputs.cdk_toolkit_found }}" ]]; then
+           cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
+         fi
          cdk deploy --require-approval never
         working-directory: s3_resource
 
